@@ -2,6 +2,10 @@ import { config } from "dotenv";
 import express from "express"
 import cors from "cors"
 import cookieParser from "cookie-parser";
+import fileUpload from "express-fileupload";
+import { connection } from "./database/connection.js";
+import { errorMiddleware } from "./middlewares/error.js";
+
 
 const app = express();
 config({
@@ -15,8 +19,20 @@ app.use(cors({
     credentials: true,
 }));
 
-// middleware
+// cookieparser middleware parses the cookies in incoming requests and makes them accessible via req.cookies
 app.use(cookieParser());
 app.use(express.json());
+// middleware in Express.js that helps your app handle data sent from HTML forms.
+app.use(express.urlencoded({extended: true}))
+app.use(
+    fileUpload({
+        useTempFiles: true,
+        tempFileDir: "/tmp/",
+}));
+
+connection();
+
+// error.js file 
+app.use(errorMiddleware)
 
 export default app;
